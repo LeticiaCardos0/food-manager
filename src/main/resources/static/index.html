@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodManager — Operação do Restaurante</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+
+  <button id="menuToggle" class="menu-toggle" aria-label="Abrir menu">☰</button>
+
+  <aside class="sidebar">
+    <div class="sidebar-brand" title="FoodManager">🍔</div>
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-link active" data-page="dashboard" title="Pedidos ao vivo"><span class="nav-icon">🔥</span><span class="nav-text">Pedidos</span></a>
+      <a href="#categorias" class="nav-link" data-page="categorias" title="Categorias"><span class="nav-icon">🏷️</span><span class="nav-text">Categorias</span></a>
+      <a href="#produtos" class="nav-link" data-page="produtos" title="Cardápio"><span class="nav-icon">🍽️</span><span class="nav-text">Cardápio</span></a>
+      <a href="#clientes" class="nav-link" data-page="clientes" title="Clientes"><span class="nav-icon">👤</span><span class="nav-text">Clientes</span></a>
+      <a href="#pedidos" class="nav-link" data-page="pedidos" title="Todos os pedidos"><span class="nav-icon">🧾</span><span class="nav-text">Todos pedidos</span></a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD / PAINEL DE OPERAÇÃO -->
+    <section id="page-dashboard" class="page-section active">
+      <header class="page-header">
+        <div>
+          <h1>Painel de operação</h1>
+          <p class="page-subtitle">Acompanhe os pedidos em tempo real</p>
+        </div>
+        <button class="btn btn-primary" id="btnNovoPedido">+ Novo pedido</button>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🧾</div>
+          <div class="stat-info"><span class="stat-value" id="totalPedidos">0</span><span class="stat-label">Pedidos</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👤</div>
+          <div class="stat-info"><span class="stat-value" id="totalClientes">0</span><span class="stat-label">Clientes</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🍽️</div>
+          <div class="stat-info"><span class="stat-value" id="totalProdutos">0</span><span class="stat-label">Itens no cardápio</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏷️</div>
+          <div class="stat-info"><span class="stat-value" id="totalCategorias">0</span><span class="stat-label">Categorias</span></div>
+        </div>
+        <div class="stat-card stat-card-highlight">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info"><span class="stat-value" id="valorTotalPedidos">R$ 0,00</span><span class="stat-label">Valor total em pedidos</span></div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Quadro de pedidos por status</h2>
+      <div id="kanbanBoard" class="kanban-board"></div>
+
+      <div class="operation-panels">
+        <div class="panel">
+          <div class="panel-header"><h2>Pedidos recentes</h2></div>
+          <table class="data-table">
+            <thead><tr><th>Nº</th><th>Cliente</th><th>Data</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody id="recentPedidosBody"></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Itens recentes do cardápio</h2></div>
+          <table class="data-table">
+            <thead><tr><th>Nome</th><th>Preço</th><th>Tempo preparo</th></tr></thead>
+            <tbody id="recentProdutosBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section id="page-categorias" class="page-section">
+      <header class="page-header">
+        <h1>Categorias</h1>
+        <button class="btn btn-primary" id="btnNovaCategoria">+ Nova categoria</button>
+      </header>
+      <div class="toolbar">
+        <input type="text" id="categoriaSearch" class="search-input" placeholder="Pesquisar categoria...">
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>Nome</th><th>Descrição</th><th>Ações</th></tr></thead>
+          <tbody id="categoriasTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="page-produtos" class="page-section">
+      <header class="page-header">
+        <h1>Cardápio (Produtos)</h1>
+        <button class="btn btn-primary" id="btnNovoProduto">+ Novo produto</button>
+      </header>
+      <div class="toolbar">
+        <input type="text" id="produtoSearch" class="search-input" placeholder="Pesquisar produto...">
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>Nome</th><th>Preço</th><th>Tempo preparo</th><th>Descrição</th><th>Ações</th></tr></thead>
+          <tbody id="produtosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section id="page-clientes" class="page-section">
+      <header class="page-header">
+        <h1>Clientes</h1>
+        <button class="btn btn-primary" id="btnNovoCliente">+ Novo cliente</button>
+      </header>
+      <div class="toolbar">
+        <input type="text" id="clienteSearch" class="search-input" placeholder="Pesquisar cliente...">
+        <select id="clienteFiltroStatus" class="filter-select">
+          <option value="">Todos os status</option>
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>CPF</th><th>Endereço</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="clientesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PEDIDOS (lista completa, acessível pelo botão do painel) -->
+    <section id="page-pedidos" class="page-section">
+      <header class="page-header">
+        <h1>Todos os pedidos</h1>
+        <button class="btn btn-primary" id="btnNovoPedidoLista">+ Novo pedido</button>
+      </header>
+      <div class="toolbar">
+        <input type="text" id="pedidoSearch" class="search-input" placeholder="Pesquisar por nº ou cliente...">
+        <select id="pedidoFiltroStatus" class="filter-select">
+          <option value="">Todos os status</option>
+          <option value="PENDENTE">Pendente</option>
+          <option value="CONFIRMADO">Confirmado</option>
+          <option value="EM_PREPARACAO">Em preparação</option>
+          <option value="SAIU_PARA_ENTREGA">Saiu para entrega</option>
+          <option value="ENTREGUE">Entregue</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>Nº</th><th>Cliente</th><th>Data</th><th>Valor total</th><th>Status</th><th>Pagamento</th><th>Tipo</th><th>Ações</th></tr></thead>
+          <tbody id="pedidosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal-box">
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="app.js"></script>
+<script>
+  // Atalho: no painel de operação, "Novo pedido" abre direto o formulário;
+  // dentro da tela "Todos os pedidos" existe um botão equivalente com outro id.
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnLista = document.getElementById('btnNovoPedidoLista');
+    if (btnLista) btnLista.addEventListener('click', () => openPedidoForm(null));
+  });
+</script>
+</body>
+</html>

@@ -27,7 +27,7 @@ public class ProdutoService {
                 .nome(dado.nome())
                 .preco(dado.preco())
                 .descricao(dado.descricao())
-                .tempo_preparo(dado.tempo_preparo())
+                .tempoPreparo(dado.tempoPreparo())
                 .build();
 
         return this.repository.save(produto);
@@ -38,7 +38,7 @@ public class ProdutoService {
         produto.setNome(dado.nome());
         produto.setPreco(dado.preco());
         produto.setDescricao(dado.descricao());
-        produto.setTempo_preparo(dado.tempo_preparo());
+        produto.setTempoPreparo(dado.tempoPreparo());
 
         return repository.save(produto);
     }

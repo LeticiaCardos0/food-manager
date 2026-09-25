@@ -26,6 +26,6 @@ public class Produto {
     @Column(length = 255)
     private String descricao;
 
-    @Column(nullable = false)
-    private Integer tempo_preparo;
+    @Column(name = "tempo_preparo", nullable = false)
+    private Integer tempoPreparo;
 }
