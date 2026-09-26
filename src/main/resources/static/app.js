@@ -505,7 +505,9 @@ function renderClientes() {
       <td>${escapeHtml(c.cpf)}</td>
       <td>${escapeHtml(c.endereco)}</td>
       <td>${formatDate(c.data_cadastro)}</td>
-      <td><span class="status-badge ${c.ativo ? 'status-ativo' : 'status-inativo'}">${c.ativo ? 'Ativo' : 'Inativo'}</span></td>
+      <td>
+        <button type="button" class="status-badge status-toggle ${c.ativo ? 'status-ativo' : 'status-inativo'}" title="Clique para alternar" data-action="toggle-status" data-id="${c.id}">${c.ativo ? 'Ativo' : 'Inativo'} <span class="status-toggle-arrow">⇄</span></button>
+      </td>
       <td class="actions-cell">
         <button type="button" class="btn-icon" title="Visualizar" data-action="view" data-id="${c.id}">👁️</button>
         <button type="button" class="btn-icon" title="Editar" data-action="edit" data-id="${c.id}">✏️</button>
@@ -520,8 +522,28 @@ function renderClientes() {
             if (btn.dataset.action === 'view') viewCliente(id);
             if (btn.dataset.action === 'edit') openClienteForm(id);
             if (btn.dataset.action === 'delete') deleteCliente(id);
+            if (btn.dataset.action === 'toggle-status') toggleClienteStatus(id);
         });
     });
+}
+
+async function toggleClienteStatus(id) {
+    const item = db.clientes.find(c => c.id === id);
+    if (!item) return;
+    const novoStatus = !item.ativo;
+    const payload = {
+        nome: item.nome, email: item.email, telefone: item.telefone,
+        cpf: item.cpf, endereco: item.endereco,
+        ativo: novoStatus, data_cadastro: item.data_cadastro
+    };
+    try {
+        await apiPut(`/clientes/${id}`, payload);
+        db.clientes = await apiGet('/clientes');
+        showToast(`Cliente marcado como ${novoStatus ? 'Ativo' : 'Inativo'}!`);
+        renderClientes();
+    } catch (err) {
+        showToast('Não foi possível alterar o status do cliente', 'error');
+    }
 }
 
 function openClienteForm(id) {
@@ -650,7 +672,9 @@ function renderPedidos() {
       <td>${escapeHtml(p.nome_cliente)}</td>
       <td>${formatDate(p.data)}</td>
       <td>${formatCurrency(p.valor_total)}</td>
-      <td><span class="status-badge status-${slug(p.status)}">${STATUS_LABELS[p.status] || p.status}</span></td>
+      <td>
+        <button type="button" class="status-badge status-toggle status-${slug(p.status)}" title="Clique para alterar o status" data-action="change-status" data-id="${p.id}">${STATUS_LABELS[p.status] || p.status} <span class="status-toggle-arrow">▾</span></button>
+      </td>
       <td>${FORMA_PAGAMENTO_LABELS[p.forma_pagamento] || p.forma_pagamento}</td>
       <td>${TIPO_PEDIDO_LABELS[p.tipo_pedido] || p.tipo_pedido}</td>
       <td class="actions-cell">
@@ -667,7 +691,46 @@ function renderPedidos() {
             if (btn.dataset.action === 'view') viewPedido(id);
             if (btn.dataset.action === 'edit') openPedidoForm(id);
             if (btn.dataset.action === 'delete') deletePedido(id);
+            if (btn.dataset.action === 'change-status') changeStatusPedido(id);
         });
+    });
+}
+
+function changeStatusPedido(id) {
+    const item = db.pedidos.find(p => p.id === id);
+    if (!item) return;
+    openModal(`
+    <h3>Alterar status — Pedido #${item.id}</h3>
+    <p><strong>Cliente:</strong> ${escapeHtml(item.nome_cliente)}</p>
+    <div class="form-group">
+      <label>Novo status</label>
+      <select id="quickStatusChange">
+        ${STATUS_PEDIDO.map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''}>${STATUS_LABELS[s]}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" id="cancelForm">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="applyStatus">Atualizar status</button>
+    </div>
+  `);
+    qs('#cancelForm').addEventListener('click', closeModal);
+    qs('#applyStatus').addEventListener('click', async () => {
+        const novoStatus = qs('#quickStatusChange').value;
+        const payload = {
+            nome_cliente: item.nome_cliente, data: item.data, valor_total: item.valor_total,
+            tempo_estimado: item.tempo_estimado, status: novoStatus,
+            forma_pagamento: item.forma_pagamento, tipo_pedido: item.tipo_pedido, observacao: item.observacao
+        };
+        try {
+            await apiPut(`/pedidos/${item.id}`, payload);
+            db.pedidos = await apiGet('/pedidos');
+            showToast('Status do pedido atualizado!');
+            closeModal();
+            renderPedidos();
+            renderDashboard();
+        } catch (err) {
+            showToast('Não foi possível atualizar o status', 'error');
+        }
     });
 }
 

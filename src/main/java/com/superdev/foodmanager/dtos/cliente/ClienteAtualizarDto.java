@@ -1,6 +1,5 @@
 package com.superdev.foodmanager.dtos.cliente;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -26,5 +25,6 @@ public record ClienteAtualizarDto(
         Boolean ativo,
 
         LocalDate dataCadastro
+
 ) {
 }

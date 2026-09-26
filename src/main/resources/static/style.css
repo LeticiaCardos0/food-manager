@@ -306,6 +306,13 @@ input:focus, select:focus, textarea:focus {
   display: inline-block; padding: 4px 10px; border-radius: 999px;
   font-size: 0.74rem; font-weight: 700; white-space: nowrap;
 }
+.status-toggle {
+  border: none; cursor: pointer; font-family: inherit;
+  transition: filter 0.15s, transform 0.05s;
+}
+.status-toggle:hover { filter: brightness(0.92); }
+.status-toggle:active { transform: scale(0.97); }
+.status-toggle-arrow { font-size: 0.8em; opacity: 0.65; margin-left: 1px; }
 .status-pendente { background: #fdf1da; color: var(--color-warning); }
 .status-confirmado { background: #e4ecff; color: var(--color-info); }
 .status-em-preparacao { background: #ede4ff; color: #7c3aed; }
